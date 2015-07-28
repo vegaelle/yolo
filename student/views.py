@@ -1,3 +1,8 @@
 from django.shortcuts import render
+from learning.decorators import student
 
-# Create your views here.
+
+@student
+def home(request):
+    promotion = request.user.groups.first().promotion
+    return render(request, 'student/home.html', {'promotion': promotion})

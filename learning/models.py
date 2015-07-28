@@ -1,3 +1,4 @@
+from calendar import Calendar
 from datetime import timedelta
 from django.db import models
 from django.contrib.auth.models import User, Group
@@ -5,17 +6,31 @@ from polymorphic import PolymorphicModel
 from .validators import colorValidator
 
 
+def get_event_calendar(year, month):
+    c = Calendar()
+    cal = c.monthdatescalendar(year, month)
+    # replacing Date objects with tuples
+    for i, w in enumerate(cal):
+        for j, d in enumerate(w):
+            cal[i][j] = (d, [])
+
+    return cal
+
+
 class Member(models.Model):
     user = models.OneToOneField(User, verbose_name='utilisateur',
                                 related_name='member')
-    avatar = models.ImageField(upload_to='avatar')
+    avatar = models.ImageField(upload_to='avatar', null=True, blank=True)
     type = models.CharField(max_length=10, choices=(('student', 'élève'),
                                                     ('teacher', 'formateur'),
                                                     ('admin', 'administrateur')
                                                     ),
                             verbose_name='type')
     tags = models.ManyToManyField('Tag', related_name='members',
-                                  verbose_name='tags')
+                                  verbose_name='tags', blank=True)
+
+    def __str__(self):
+        return self.user.__str__()
 
     class Meta:
         verbose_name = 'Membre'
@@ -173,6 +188,28 @@ class Promotion(models.Model):
     def __str__(self):
         return self.name
 
+    def calendars(self):
+        """ returns a list of Calendar objects (list of weeks, represented by
+        DateTime/lists of events tuples) with all events for the current
+        Promotion.
+        """
+        calendars = []
+        cal = None
+        cur_month = (None, None)
+        for day in self.days.all():
+            month = (day.day.year, day.day.month)
+            if month != cur_month:  # new month
+                if cal is not None:
+                    calendars.append(cal)
+                cal = get_event_calendar(*month)
+                cur_month = month
+            day_pos = ((day.day.day - 1) // 7 + 1, day.day.weekday())
+            cal[day_pos[0]][day_pos[1]][1].extend(day.intervals.all())
+        if cal is not None:
+            calendars.append(cal)
+
+        return calendars
+
     class Meta:
         verbose_name = 'promotion'
 
@@ -235,6 +272,8 @@ class CourseIntervalAttribution(models.Model):
     course_attribution = models.ForeignKey('CourseAttribution',
                                            verbose_name='cours planifié',
                                            related_name='intervals')
+    day = models.ForeignKey('DayAttribution', verbose_name='jour',
+                            related_name='intervals')
     begin = models.DateTimeField(verbose_name='début')
     end = models.DateTimeField(verbose_name='fin')
 
