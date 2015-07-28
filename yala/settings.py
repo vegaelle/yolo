@@ -114,3 +114,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_URL = urlresolvers.reverse_lazy('login')
 LOGOUT_URL = urlresolvers.reverse_lazy('logout')
+
+try:
+    from localsettings import *
+except ImportError:
+    pass
