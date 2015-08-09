@@ -1,4 +1,4 @@
-"""yala URL Configuration
+"""yolo URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.8/topics/http/urls/
@@ -17,15 +17,17 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-# from management import urls as management_urls
+from management import urls as management_urls
 # from teacher import urls as teacher_urls
 from student import urls as student_urls
 from learning import urls as learning_urls
 
 urlpatterns = [
-    # url(r'^management/', include(management_urls)),
+    url(r'^management/', include(management_urls, namespace='management',
+                                 app_name='management')),
     # url(r'^teacher/', include(teacher_urls)),
-    url(r'^', include(student_urls)),
-    url(r'^account/', include(learning_urls)),
+    url(r'^', include(student_urls, namespace='student', app_name='student')),
+    url(r'^account/', include(learning_urls, namespace='learning',
+                              app_name='learning')),
     url(r'^admin/', include(admin.site.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

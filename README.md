@@ -1,6 +1,6 @@
-# YALA
+# YOLO
 
-Yet Another Learning Assistant, a learning management system written in Django.
+YOu Learn Online, a learning management system written in Django.
 
 ## Requirements
 
@@ -24,15 +24,15 @@ Debian-Like system):
 
 2. Create a virtualenv with Python3
 
-    virtualenv -p /usr/bin/python3 yala_env
+    virtualenv -p /usr/bin/python3 yolo_env
 
 3. Activate this virtualenv
 
-    source ./yala_env/bin/activate
+    source ./yolo_env/bin/activate
 
 4. Clone repository, and get in the project dir
 
-    git clone https://github.com/gordon-/yala && cd yala
+    git clone https://github.com/gordon-/yolo && cd yolo
 
 5. Install project dependencies
 
@@ -56,7 +56,7 @@ Optionnally, you can load some fixtures as demo data, with this command:
 ## Run in production
 
 In production, you are adviced to use a Postgresql database. From the Django
-root , copy `yala/localsettings.py.example` to `yala/localsettings.py`, and
+root , copy `yolo/localsettings.py.example` to `yolo/localsettings.py`, and
 edit the content of the new file. Then, type:
 
     ./manage.py collectstatic

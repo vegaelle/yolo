@@ -9,7 +9,7 @@ SECRET_KEY = 'YOUR SECRET KEY HERE'
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['yala.org']
+ALLOWED_HOSTS = ['yolo.org']
 
 DATABASES = {
     'default': {
@@ -22,4 +22,4 @@ DATABASES = {
     }
 }
 
-ADMINS = (('Gordon', 'yala@gordon.re'),)
+ADMINS = (('Gordon', 'yolo@gordon.re'),)
