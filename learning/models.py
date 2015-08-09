@@ -1,12 +1,121 @@
 from calendar import Calendar
-from datetime import timedelta
+from datetime import timedelta, date, datetime
 from django.db import models
 from django.contrib.auth.models import User, Group
 from polymorphic import PolymorphicModel
+from dateutils import relativedelta
 from .validators import colorValidator
 
 
-def get_event_calendar(year, month):
+class EventDay:
+
+    def __init__(self, day):
+        if isinstance(day, date):
+            self.date = day
+        elif isinstance(day, datetime):
+            self.date = day.date
+        self.events = []
+
+    def append(self, item):
+        self.events.append(item)
+
+    def __len__(self):
+        return len(self.events)
+
+    def __iter__(self):
+        return self.events.__iter__()
+
+    def __str__(self):
+        return '{count} item{s} for {date}'\
+            .format(count=len(self.events),
+                    s='s' if len(self.events) > 1 else '',
+                    date=self.date.strftime('%m/%d/%Y'))
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class EventView:
+
+    def __init__(self, events, date_getter, end_getter=None):
+        self.events = events
+        self.date_getter = date_getter
+        self.end_getter = end_getter
+        # self.days = defaultdict(lambda: EventDay())
+        self.days = {}
+        for event in events:
+            event_date = self.get_date_info(event, date_getter)
+            if event_date not in self.days:
+                self.days[event_date] = EventDay(event_date)
+            if end_getter is not None:
+                event_end = self.get_date_info(event, end_getter)
+            if event_end > event_date:
+                end_date = event_end
+                cur_tmp_date = event_date
+                while cur_tmp_date <= end_date:
+                    if cur_tmp_date not in self.days:
+                        self.days[cur_tmp_date] = EventDay(cur_tmp_date)
+                    self.days[cur_tmp_date].append(event)
+                    cur_tmp_date = cur_tmp_date + timedelta(days=1)
+            else:
+                self.days[event_date].append(event)
+
+    def get_date_info(self, event, getter):
+        """
+        Returns the date or the duration of an event object, given by the
+        getter parameter. This may be callable, taking the event in parameter,
+        and returning a Date/Timedelta object, or may be  key of a dict, or
+        attribute.
+        """
+        if callable(getter):
+            value = getter(event)
+        else:
+            try:
+                value = getattr(event, getter)
+            except AttributeError:
+                try:
+                    value = event[getter]
+                except TypeError:
+                    raise TypeError('getter could not apply to event')
+
+        return value
+
+    def calendar(self):
+        if len(self.days) == 0:
+            raise ValueError('Calendar rendering is not permitted without '
+                             'events.')
+        cal = Calendar()
+        months = []
+        remaining_days = sorted([k for k in self.days.keys()])
+        current_day = remaining_days[0]
+        remaining_events = len(self.events)
+        while remaining_events > 0:
+            month = cal.monthdatescalendar(current_day.year, current_day.month)
+            for i, month_week in enumerate(month):
+                for j, day in enumerate(month_week):
+                    if day in self.days:
+                        events = self.days[day]
+                        print('Adding {ev}'.format(ev=events))
+                        # removing to counter the already-removed events
+                        daily_events_count = 0
+                        for ev in events:
+                            if self.get_date_info(ev, self.date_getter) == \
+                                    events.date:
+                                daily_events_count += 1
+                        remaining_events -= daily_events_count
+                        print('Remaining events: {}'.format(remaining_events))
+                        month[i][j] = events
+                    else:
+                        month[i][j] = EventDay(day)
+            months.append({'month': current_day.replace(day=1),
+                           'dates': month})
+            current_day = current_day + relativedelta(months=1)
+            import ipdb
+            ipdb.set_trace()
+        return months
+
+
+def get_event_calendar(year, month, events=[]):
     c = Calendar()
     cal = c.monthdatescalendar(year, month)
     # replacing Date objects with tuples
@@ -86,10 +195,12 @@ class Course(PolymorphicModel):
                                              default=timedelta(days=1))
     dependencies = models.ManyToManyField('Objective',
                                           verbose_name='dépendances',
-                                          related_name='dependant_courses')
+                                          related_name='dependant_courses',
+                                          blank=True)
     objectives = models.ManyToManyField('Objective',
                                         verbose_name='objectifs apportés',
-                                        related_name='courses')
+                                        related_name='courses',
+                                        blank=True)
     tag = models.ForeignKey('Tag', verbose_name='tag', related_name='courses')
 
     def __str__(self):
@@ -193,6 +304,9 @@ class Promotion(models.Model):
         DateTime/lists of events tuples) with all events for the current
         Promotion.
         """
+        ev = EventView(self.courses.all(), lambda c: c.begin.date(),
+                       lambda c: c.end.date())
+        return ev.calendar()
         calendars = []
         cal = None
         cur_month = (None, None)
@@ -255,8 +369,8 @@ class CourseAttribution(models.Model):
     course = models.ForeignKey('Course', verbose_name='cours',
                                related_name='course_attributions')
 
-    date = models.DateTimeField(verbose_name='date')
-    duration = models.DurationField(verbose_name='durée')
+    begin = models.DateTimeField(verbose_name='date et heure de début')
+    end = models.DateTimeField(verbose_name='date et heure de fin')
 
     def __str__(self):
         return '{promotion} — {course}'.format(promotion=self.promotion.name,
@@ -266,24 +380,3 @@ class CourseAttribution(models.Model):
         verbose_name = 'attribution de cours'
         verbose_name_plural = 'attributions de cours'
         unique_together = (('promotion', 'course'), )
-
-
-class CourseIntervalAttribution(models.Model):
-    course_attribution = models.ForeignKey('CourseAttribution',
-                                           verbose_name='cours planifié',
-                                           related_name='intervals')
-    day = models.ForeignKey('DayAttribution', verbose_name='jour',
-                            related_name='intervals')
-    begin = models.DateTimeField(verbose_name='début')
-    end = models.DateTimeField(verbose_name='fin')
-
-    def __str__(self):
-        return \
-            '{promotion} — {course}'.format(promotion=self.course_attribution
-                                            .promotion.name,
-                                            course=self.course_attribution
-                                            .course.name)
-
-    class Meta:
-        verbose_name = 'intervalle d’attribution de cours'
-        verbose_name_plural = 'intervalles d’attributions de cours'

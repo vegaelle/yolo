@@ -4,8 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import \
     Member, Tag, Formation, Objective, Course, LectureCourse,\
     LectureFile, QuestionCourse, Question, Answer, PracticeCourse, Promotion,\
-    DayAttribution, CourseAttribution, CourseIntervalAttribution,\
-    ObjectiveAttribution
+    DayAttribution, CourseAttribution, ObjectiveAttribution
 
 admin.site.unregister(User)
 
