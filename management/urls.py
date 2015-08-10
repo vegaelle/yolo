@@ -3,5 +3,6 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.Home.as_view(), name='home'),
+    url(r'^$', views.home, name='home'),
+    url(r'^planning/(?P<pk>\d+)/?$', views.planning, name='planning'),
 ]
