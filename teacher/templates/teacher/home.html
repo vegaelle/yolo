@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Liste des promotions</h2>
+
+<p><a href="">Planifier des cours</a></p>
+
+<ul>
+    {% for promo in promotions %}
+    <li><a href="{% url 'management:planning' pk=promo.pk %}">{{ promo }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -17,17 +17,9 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from management import urls as management_urls
-# from teacher import urls as teacher_urls
-from student import urls as student_urls
 from learning import urls as learning_urls
 
 urlpatterns = [
-    url(r'^management/', include(management_urls, namespace='management',
-                                 app_name='management')),
-    # url(r'^teacher/', include(teacher_urls)),
-    url(r'^', include(student_urls, namespace='student', app_name='student')),
-    url(r'^account/', include(learning_urls, namespace='learning',
-                              app_name='learning')),
+    url(r'^', include(learning_urls)),
     url(r'^admin/', include(admin.site.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

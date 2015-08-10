@@ -19,9 +19,9 @@ class UserAdmin(UserAdmin):
     inlines = (MemberInline, )
 
 
-# @admin.register(Tag)
-# class TagAdmin(admin.ModelAdmin):
-#     pass
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Formation)
