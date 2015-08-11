@@ -2,5 +2,41 @@
 
 {% block content %}
 <p>Welcome</p>
-        <p><strong>Promotion: </strong> {{ promotion }}</p>
+    <p><strong>Promotion: </strong> {{ promotion }}</p>
+    <div class="panel-group panel-group-table">
+        {% with cal=promotion.calendars %}
+        <div id="fullcalendar">
+        {% for month in cal %}
+            <div class="mois" id="mois{{ forloop.counter }}">
+                <div id="previous"></div>
+                <h2>{{ month.month | date:'F Y' }}</h2>
+                {% for week in month.dates %}
+                <div class="semaine" id="semaine{{ forloop.counter }}">
+                    {% for day in week %}
+                        <div class="jour integration">
+                            <span class="numberDay">{{ day.date.day }}</span>
+                            {% for course in day %}
+                            <p class="moduleInte{% if course.begin.day == day.date.day and course.end.day != day.date.day %}
+                            moduleStart
+                            {% elif course.begin.day != day.date.day and course.end.day != day.date.day %} moduleMiddle
+                            {% elif course.end.day == day.date.day and course.begin.day != day.date.day %} moduleEnd
+                            {% endif %}"><i class="fa fa-book"></i>
+                            <span class="level easy"></span> {{ course }}</p>
+                            {% endfor %}
+                            <!--<p><i class="fa fa-pencil"></i> <span
+                                class="level easy"></span> Exo "Hello
+                                Word"</p>-->
+                            <!--<ul>
+                                <li>Créer une première page HTML</li>
+                                <li>L'indentation, la coloration syntaxique</li>
+                                </ul>-->
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        {% endwith %}
+        </div>
+    </div>
 {% endblock %}

@@ -91,27 +91,29 @@ class EventView:
         remaining_events = len(self.events)
         while remaining_events > 0:
             month = cal.monthdatescalendar(current_day.year, current_day.month)
+            month_view = []
             for i, month_week in enumerate(month):
+                month_view.append([])
                 for j, day in enumerate(month_week):
-                    if day in self.days:
-                        events = self.days[day]
-                        print('Adding {ev}'.format(ev=events))
-                        # removing to counter the already-removed events
-                        daily_events_count = 0
-                        for ev in events:
-                            if self.get_date_info(ev, self.date_getter) == \
-                                    events.date:
-                                daily_events_count += 1
-                        remaining_events -= daily_events_count
-                        print('Remaining events: {}'.format(remaining_events))
-                        month[i][j] = events
-                    else:
-                        month[i][j] = EventDay(day)
+                    if day.weekday() not in [5, 6]:
+                        month_view[i].append([])
+                        if day in self.days:
+                            events = self.days[day]
+                            # print('Adding {ev}'.format(ev=events))
+                            # removing to counter the already-removed events
+                            daily_events_count = 0
+                            for ev in events:
+                                if self.get_date_info(ev, self.date_getter) == \
+                                        events.date:
+                                    daily_events_count += 1
+                            remaining_events -= daily_events_count
+                            # print('Remaining events: {}'.format(remaining_events))
+                            month_view[i][j] = events
+                        else:
+                            month_view[i][j] = EventDay(day)
             months.append({'month': current_day.replace(day=1),
-                           'dates': month})
+                           'dates': month_view})
             current_day = current_day + relativedelta(months=1)
-            import ipdb
-            ipdb.set_trace()
         return months
 
 
