@@ -1,5 +1,6 @@
 from calendar import Calendar
 from datetime import timedelta, date, datetime
+import copy
 
 from django.db import models
 from django.contrib.auth.models import User, Group
@@ -53,7 +54,7 @@ class EventView:
         # self.days = defaultdict(lambda: EventDay())
         self.days = {}
         if days is not None:
-            self.add_days_properties(days)
+            self.add_days_attributes(days)
         self.add_events(events)
 
     def add_events(self, events, date_getter=None, end_getter=None):
@@ -86,17 +87,23 @@ class EventView:
             cur_tmp_date = event_date
             while cur_tmp_date <= end_date:
                 if cur_tmp_date not in self.days:
-                    self.days[cur_tmp_date] = EventDay(cur_tmp_date)
+                    default_attributes = {
+                        'active': False,
+                        'today': cur_tmp_date == date.today(),
+                    }
+                    self.days[cur_tmp_date] = EventDay(
+                        cur_tmp_date,
+                        attributes=default_attributes)
                 self.days[cur_tmp_date].append(event)
                 cur_tmp_date = cur_tmp_date + timedelta(days=1)
         else:
             self.days[event_date].append(event)
 
-    def add_days_properties(self, days):
+    def add_days_attributes(self, days):
         """
-        adds properties to a day object.
+        adds attributes to a day object.
         The 'days' argument must be a dict, in which keys are date objects,
-        and values are dicts of properties.
+        and values are dicts of attributes.
         """
         for day, attributes in days.items():
             if day in self.days:
@@ -140,7 +147,7 @@ class EventView:
         cal = Calendar()
         months = []
         remaining_days = sorted([k for k in self.days.keys()])
-        current_day = remaining_days[0]
+        current_day = remaining_days[0].replace(day=1)
         remaining_events = len(self.events)
         while remaining_events > 0:
             month = cal.monthdatescalendar(current_day.year, current_day.month)
@@ -148,16 +155,28 @@ class EventView:
             for i, month_week in enumerate(month):
                 month_view.append([])
                 for j, day in enumerate(month_week):
-                    if day.weekday() not in [5, 6]:
+                    if day.weekday() not in [5, 6]:  # weekend removal
                         month_view[i].append([])
                         if day in self.days:
                             events, daily_events_count = \
                                 self._extract_day_events(day)
+                            events = copy.deepcopy(events)
+                            events.add_attributes({
+                                'cur_month': day.month == current_day.month,
+                            })
                             remaining_events -= daily_events_count
                             month_view[i][j] = events
                         else:
-                            month_view[i][j] = EventDay(day)
-            months.append({'month': current_day.replace(day=1),
+
+                            default_attributes = {
+                                'active': False,
+                                'today': day == date.today(),
+                                'cur_month': day.month == current_day.month
+                            }
+                            month_view[i][j] = EventDay(
+                                day,
+                                attributes=default_attributes)
+            months.append({'month': current_day,
                            'dates': month_view})
             current_day = current_day + relativedelta(months=1)
         return months
@@ -166,7 +185,7 @@ class EventView:
         events = self.days[day]
         # removing to counter the already-removed events
         daily_events_count = 0
-        for ev in events:
+        for i, ev in enumerate(events):
             if self.get_date_info(ev, self.date_getter) == \
                     events.date:
                 daily_events_count += 1
@@ -370,8 +389,8 @@ class Promotion(models.Model):
         """
         ev = EventView(self.courses.all(), lambda c: c.begin.date(),
                        lambda c: c.end.date())
-        properties = {day.day: day.properties() for day in self.days.all()}
-        ev.add_days_properties(properties)
+        attributes = {day.day: day.attributes() for day in self.days.all()}
+        ev.add_days_attributes(attributes)
         return ev.calendar()
 
     class Meta:
@@ -386,14 +405,16 @@ class DayAttribution(models.Model):
     day = models.DateField(verbose_name='jour')
     tag = models.ForeignKey('Tag', verbose_name='tag', related_name='days')
 
-    def properties(self):
+    def attributes(self):
         """
-        Returns a dict of properties for the current day.
+        Returns a dict of attributes for the current day.
         """
-        props = {}
-        props['assigned'] = self.assigned
-        props['tag'] = self.tag
-        return props
+        attrs = {}
+        attrs['active'] = True
+        attrs['today'] = self.day == date.today()
+        attrs['assigned'] = self.assigned
+        attrs['tag'] = self.tag
+        return attrs
 
     def __str__(self):
         return '{promotion} : {day}'.format(promotion=self.promotion.name,
