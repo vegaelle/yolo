@@ -18,7 +18,14 @@
             <!--<a href="messagerie.html"><i class="fa fa-envelope"></i> - Messagerie</a>-->
             <a href="calendar.html"><i class="fa fa-calendar"></i>Calendrier</a>
             <a href="forum.html"><i class="fa fa-users"></i>Forum</a>
-            <a href="profil.html" class="right">{name_user} <img src="http://justine-muller.fr/img/logo200.png" alt="photo de {name_user}"></a>
+            {% if user.is_authenticated %}
+            <a href="profil.html" class="right">{{ user }} 
+                {% if user.member.avatar %}
+                    <img src="{{ user.member.avatar.url }}" alt="photo de {{ user }}"></a>
+                {% else %}
+                    <img src="{% static 'img/avatar.jpg' %}" alt="photo de {{ user }}"></a>
+                {% endif %}
+            {% endif %}
         </nav>
     </header>
     <main>
