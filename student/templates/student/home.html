@@ -13,10 +13,10 @@
                 {% for week in month.dates %}
                 <div class="semaine" id="semaine{{ forloop.counter }}">
                     {% for day in week %}
-                        <div class="jour integration">
+                        <div class="jour {{ day.attributes.tag.to_css }}">
                             <span class="numberDay">{{ day.date.day }}</span>
                             {% for course in day %}
-                            <p class="moduleInte{% if course.begin.day == day.date.day and course.end.day != day.date.day %}
+                            <p class="module {{ day.attributes.tag.to_css }}{% if course.begin.day == day.date.day and course.end.day != day.date.day %}
                             moduleStart
                             {% elif course.begin.day != day.date.day and course.end.day != day.date.day %} moduleMiddle
                             {% elif course.end.day == day.date.day and course.begin.day != day.date.day %} moduleEnd
