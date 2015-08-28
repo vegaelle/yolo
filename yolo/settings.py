@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'rest_framework',
     'learning',
     'management',
     'teacher',
@@ -121,6 +122,12 @@ LOGOUT_URL = urlresolvers.reverse_lazy('logout')
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ('127.0.0.1', )
 DEBUG_TOOLBAR_CONFIG = {'JQUERY_URL': STATIC_URL + 'js/jquery.min.js'}
+
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS':
+    'rest_framework.versioning.URLPathVersioning',
+    'ALLOWED_VERSIONS': ('v1', ),
+    }
 
 try:
     from localsettings import *
