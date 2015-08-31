@@ -106,6 +106,9 @@ class Course(PolymorphicModel):
                 return False
         return True
 
+    def course_type(self):
+        return 'Course'
+
     class Meta:
         verbose_name = 'cours'
         verbose_name_plural = 'cours'
@@ -114,6 +117,9 @@ class Course(PolymorphicModel):
 
 class LectureCourse(Course):
     content = models.TextField(verbose_name='contenu')
+
+    def course_type(self):
+        return 'Lecture'
 
     class Meta:
         verbose_name = 'cours théorique'
@@ -137,6 +143,9 @@ class LectureFile(models.Model):
 
 
 class QuestionCourse(Course):
+
+    def course_type(self):
+        return 'Question'
 
     class Meta:
         verbose_name = 'questionnaire'
@@ -180,6 +189,9 @@ class Answer(models.Model):
 class PracticeCourse(Course):
     instructions = models.TextField(verbose_name='instructions')
     repository = models.URLField(verbose_name='dépôt')
+
+    def course_type(self):
+        return 'Practice'
 
     class Meta:
         verbose_name = 'cours pratique'
