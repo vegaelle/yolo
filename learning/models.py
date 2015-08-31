@@ -2,6 +2,7 @@ from datetime import timedelta, date
 
 from django.db import models
 from django.contrib.auth.models import User, Group
+from django.utils import timezone
 from django.utils.text import slugify
 from polymorphic import PolymorphicModel
 
@@ -95,9 +96,20 @@ class Course(PolymorphicModel):
     def __str__(self):
         return self.name
 
+    def is_owned(self, user, perm):
+        if perm == 'learning.view_course':
+            try:
+                attribution = self.course_attributions.get(
+                    promotion__group__in=user.groups.all())
+                return attribution.begin < timezone.now()
+            except CourseAttribution.DoesNotExist:
+                return False
+        return True
+
     class Meta:
         verbose_name = 'cours'
         verbose_name_plural = 'cours'
+        permissions = (('view_course', 'Can view a course'), )
 
 
 class LectureCourse(Course):

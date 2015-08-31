@@ -119,6 +119,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = urlresolvers.reverse_lazy('login')
 LOGOUT_URL = urlresolvers.reverse_lazy('logout')
 
+AUTHENTICATION_BACKENDS = (
+    'learning.authentication.RowLevelPermissionBackend',
+)
+
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ('127.0.0.1', )
 DEBUG_TOOLBAR_CONFIG = {'JQUERY_URL': STATIC_URL + 'js/jquery.min.js'}
