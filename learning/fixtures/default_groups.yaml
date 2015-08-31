@@ -63,3 +63,9 @@
     - [delete_tag, learning, tag]
   model: auth.group
   pk: 2
+- fields:
+    name: student
+    permissions:
+    - [view_course, learning, course]
+  model: auth.group
+  pk: 3

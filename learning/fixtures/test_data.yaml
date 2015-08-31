@@ -1,0 +1,194 @@
+- fields:
+    name: N7
+    permissions: []
+  model: auth.group
+  pk: 1
+- fields:
+    name: N8
+    permissions: []
+  model: auth.group
+  pk: 4
+- fields: {color: '#000000', name: Nantes}
+  model: learning.tag
+  pk: 1
+- fields: {color: '#FF00FF', name: "D\xE9veloppement"}
+  model: learning.tag
+  pk: 2
+- fields: {color: '#0000FF', name: "Int\xE9gration"}
+  model: learning.tag
+  pk: 3
+- fields: {description: '', name: humour, points: 1}
+  model: learning.objective
+  pk: 1
+- fields: {description: '', name: Swag, points: 2}
+  model: learning.objective
+  pk: 2
+- fields:
+    days_count: 57
+    description: "3 mois pour apprendre un m\xE9tier\_!\_Swag\_! \u2665"
+    name: "D\xE9veloppeur/int\xE9grateur web"
+    objectives: [1]
+    tags: [2, 3]
+  model: learning.formation
+  pk: 1
+- fields:
+    formation_type: 1
+    group: [N7]
+    name: N7
+  model: learning.promotion
+  pk: 1
+- fields: {assigned: 1, day: 2015-07-24, promotion: 1, tag: 2}
+  model: learning.dayattribution
+  pk: 1
+- fields: {assigned: 1, day: 2015-07-23, promotion: 1, tag: 2}
+  model: learning.dayattribution
+  pk: 2
+- fields: {assigned: 1, day: 2015-07-27, promotion: 1, tag: 3}
+  model: learning.dayattribution
+  pk: 3
+- fields: {assigned: 1, day: 2015-08-09, promotion: 1, tag: 2}
+  model: learning.dayattribution
+  pk: 4
+- fields: {assigned: 1, day: 2015-08-10, promotion: 1, tag: 2}
+  model: learning.dayattribution
+  pk: 5
+- fields: {assigned: 1, day: 2015-08-27, promotion: 1, tag: 2}
+  model: learning.dayattribution
+  pk: 6
+- fields: {assigned: 1, day: 2015-08-11, promotion: 1, tag: 2}
+  model: learning.dayattribution
+  pk: 7
+- fields:
+    dependencies: []
+    description: Description du cours
+    name: "Cours th\xE9orique 1"
+    objectives: [1]
+    polymorphic_ctype: [learning, lecturecourse]
+    standard_duration: 1 00:00:00
+    tag: 2
+  model: learning.course
+  pk: 1
+- fields:
+    dependencies: [1]
+    description: Description du cours
+    name: Cours pratique 1
+    objectives: [2]
+    polymorphic_ctype: [learning, practicecourse]
+    standard_duration: 2 00:00:00
+    tag: 2
+  model: learning.course
+  pk: 2
+- fields:
+    dependencies: [2]
+    description: Desc
+    name: Cours pratique 2
+    objectives: []
+    polymorphic_ctype: [learning, practicecourse]
+    standard_duration: 2 00:00:00
+    tag: 2
+  model: learning.course
+  pk: 3
+- fields: {begin: ! '2015-07-23 07:30:00+00:00', course: 1, end: ! '2015-07-23 15:30:00+00:00',
+    promotion: 1}
+  model: learning.courseattribution
+  pk: 1
+- fields: {begin: ! '2015-07-24 07:30:00+00:00', course: 2, end: ! '2015-07-27 15:30:00+00:00',
+    promotion: 1}
+  model: learning.courseattribution
+  pk: 2
+- fields: {begin: ! '2015-08-10 07:30:00+00:00', course: 3, end: ! '2015-08-11 15:30:00+00:00',
+    promotion: 1}
+  model: learning.courseattribution
+  pk: 3
+- fields:
+    date_joined: 2015-08-31 09:46:43+00:00
+    email: ''
+    first_name: ''
+    groups: [2]
+    is_active: true
+    is_staff: false
+    is_superuser: false
+    last_login: null
+    last_name: ''
+    password: pbkdf2_sha256$20000$YFduwJ4kOGR8$aLrUGGkXkwAJlfiquxxr2egr1o+C0v4d5c931nMFQD4=
+    user_permissions: []
+    username: prof
+  model: auth.user
+  pk: 1
+- fields:
+    date_joined: 2015-07-24 10:20:28+00:00
+    email: ''
+    first_name: ''
+    groups:
+    - [N7]
+    - [student]
+    is_active: true
+    is_staff: false
+    is_superuser: false
+    last_login: 2015-08-27 15:16:05+00:00
+    last_name: ''
+    password: pbkdf2_sha256$20000$cL5wo1s3jjjY$CvJVAwHYrtltBj9EK4txBFls1ncAm3vbvkDRFS+12v4=
+    user_permissions: []
+    username: eleve
+  model: auth.user
+  pk: 2
+- fields:
+    date_joined: 2015-07-28 12:54:38.160474+00:00
+    email: ''
+    first_name: ''
+    groups: []
+    is_active: true
+    is_staff: false
+    is_superuser: false
+    last_login: 2015-07-28 12:54:59.893915+00:00
+    last_name: ''
+    password: pbkdf2_sha256$20000$rc7zfXPeR5Qm$I91u53S/E/rwqvOOMrdrX7FJTGlB3WgVgdWfpeAAj7k=
+    user_permissions: []
+    username: manager
+  model: auth.user
+  pk: 3
+- fields:
+    date_joined: 2015-08-31 08:30:16+00:00
+    email: ''
+    first_name: ''
+    groups:
+    - [N8]
+    - [student]
+    is_active: true
+    is_staff: false
+    is_superuser: false
+    last_login: null
+    last_name: ''
+    password: pbkdf2_sha256$20000$SwVencNN2Cij$1K3w6KzcVjpl3+38weHmgBt65WIEru9pwiItCrABB9o=
+    user_permissions: []
+    username: eleve2
+  model: auth.user
+  pk: 4
+- fields:
+    avatar: ''
+    tags: []
+    type: student
+    user: [eleve]
+  model: learning.member
+  pk: 1
+- fields:
+    avatar: ''
+    tags: []
+    type: admin
+    user: [manager]
+  model: learning.member
+  pk: 2
+- fields:
+    avatar: ''
+    tags: []
+    type: student
+    user: [eleve2]
+  model: learning.member
+  pk: 3
+- fields:
+    avatar: ''
+    tags: [2]
+    type: teacher
+    user: 5
+  model: learning.member
+  pk: 4

@@ -46,12 +46,15 @@ environment, you can work with a SQLite database. Get in the project
 repository, and type:
 
     ./manage.py migrate
-    ./manage.py createsuperuser
     ./manage.py runserver
 
 Optionnally, you can load some fixtures as demo data, with this command:
 
-    ./manage.py loaddata tests
+    ./manage.py loaddata test_data
+
+You’ll have 4 users: prof, manager, eleve, eleve2. All passwords match
+usernames (don’t ever load this fixture in production!), and some test data is
+set.
 
 ## Run in production
 
