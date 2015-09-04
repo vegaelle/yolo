@@ -189,6 +189,6 @@
     avatar: ''
     tags: [2]
     type: teacher
-    user: 5
+    user: [prof]
   model: learning.member
   pk: 4
